@@ -1,0 +1,11 @@
+Barcode,Name,SKU,Category,UnitPrice,Unit,Vendor,VendorLogo,Stock,ReorderLevel,Description,Weight,Origin,,,
+12345678901,"MacBook Pro 14"" M3 Pro",APPL-MBP14-M3,IT Equipment,2499,unit,TechSupply Co.,🖥️,8,5,"Apple MacBook Pro 14-inch with M3 Pro chip, 18GB RAM, 512GB SSD",1.61 kg,USA,,,
+67890123456,APC Smart-UPS 3000VA,PWR-UPS-3000VA,IT Equipment,3200,unit,TechSupply Co.,🖥️,2,2,APC Smart-UPS 3000VA LCD 120V with network management card slot,38.5 kg,USA,,,
+23456789012,USB-C Hub 10-in-1,ACC-USBC-HUB10,IT Accessories,89,unit,TechSupply Co.,🖥️,42,10,10-in-1 USB-C hub with HDMI, USB 3.0, SD card reader, and PD charging,0.12 kg,China
+90123456789,Magic Mouse,APPL-MMOUSE,IT Accessories,79,unit,TechSupply Co.,🖥️,30,10,Apple Magic Mouse with Multi-Touch surface, Lightning charging,0.1 kg,USA,,
+34567890123,A4 Copy Paper 500 sheets,OFF-PAPER-A4-500,Office Supplies,8.5,ream,OfficeWorld,🗂️,120,30,"Premium A4 80gsm copy paper, 500 sheets per ream, acid-free",2.5 kg,Finland,,,
+9.01235E+11,Whiteboard Markers Set,OFF-WBMK-SET,Office Supplies,9,pack,OfficeWorld,🗂️,88,20,"Dry-erase whiteboard markers, 8 colors, chisel tip, low odor",0.15 kg,Germany,,,
+45678901234,Hard Hat Class E,SAF-HHAT-CE,Safety Equipment,32,unit,SafetyFirst Inc.,🪖,15,20,ANSI/ISEA Z89.1 Class E hard hat, adjustable ratchet suspension,0.35 kg,USA,,
+78901234567,Safety Vest Hi-Vis,SAF-VEST-HV,Safety Equipment,18,unit,SafetyFirst Inc.,🪖,55,25,"ANSI Class 2 high-visibility safety vest, breathable mesh, multiple pockets",0.18 kg,Bangladesh,,,
+89012345678,First Aid Kit (Large),SAF-FAK-LG,Safety Equipment,94,kit,SafetyFirst Inc.,🪖,12,5,"200-piece first aid kit for workplace use, OSHA compliant",1.8 kg,USA,,,
+56789012345,Ergonomic Conference Chair,FUR-CHAIR-CONF,Furniture,420,unit,FurniturePro,🪑,6,3,High-back ergonomic conference chair with lumbar support and armrests,14 kg,Italy,,,

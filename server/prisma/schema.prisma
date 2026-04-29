@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  phone        String?
+  role         Role
+  password     String
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}
+
+model Item {
+  id           String   @id @default(uuid())
+  name         String
+  sku          String?
+  category     String
+  unitPrice    Float?   @map("unit_price")
+  unit         String?
+  vendor       String?
+  vendorLogo   String?  @map("vendor_logo")
+  stock        Int      @default(0)
+  reorderLevel Int      @default(0) @map("reorder_level")
+  description  String?
+  weight       String?
+  origin       String?
+  assignedTo   String   @map("assigned_to")
+  location     String
+  photoUrl     String?  @map("photo_url")
+  barcode      String   @unique
+  condition    String   @default("Good")
+  lastMaintainedAt DateTime? @map("last_maintained_at")
+  nextServiceDate DateTime? @map("next_service_date")
+  createdAt    DateTime @default(now()) @map("created_at")
+  createdBy    String   @default("Admin") @map("created_by")
+
+  scans      ScanRecord[]
+  complaints Complaint[]
+
+  @@map("items")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  action      String
+  entityType  String   @map("entity_type")
+  entityId    String   @map("entity_id")
+  details     String
+  diff        String?  // JSON string of changes
+  performedBy String   @map("performed_by")
+  performedAt DateTime @default(now()) @map("performed_at")
+
+  @@map("audit_logs")
+}
+
+model ScanRecord {
+  id        String   @id @default(uuid())
+  barcode   String
+  itemId    String?  @map("item_id")
+  scannedAt DateTime @default(now()) @map("scanned_at")
+  scannedBy String   @default("Supervisor") @map("scanned_by")
+
+  item      Item?    @relation(fields: [itemId], references: [id], onDelete: SetNull)
+
+  @@map("scan_records")
+}
+
+model Complaint {
+  id               String   @id @default(uuid())
+  itemId           String   @map("item_id")
+  itemName         String   @map("item_name")
+  itemBarcode      String   @map("item_barcode")
+  location         String
+  description      String
+  priority         Priority @default(MEDIUM)
+  raisedBy         String   @default("Supervisor") @map("raised_by")
+  raisedAt         DateTime @default(now()) @map("raised_at")
+  status           ComplaintStatus @default(OPEN)
+  resolvedAt       DateTime? @map("resolved_at")
+  resolvedBy       String?   @map("resolved_by")
+  resolvedPhotoUrl String?   @map("resolved_photo_url")
+  resolvedNote     String?   @map("resolved_note")
+
+  item             Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@map("complaints")
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum Role {
+  admin
+  supervisor
+  inventory
+}
+
+enum ComplaintStatus {
+  OPEN     @map("open")
+  RESOLVED @map("resolved")
+}
