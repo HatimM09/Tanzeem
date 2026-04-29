@@ -4,6 +4,7 @@ import {
   Package, MapPin, Tag, User, Camera,
   CheckCircle, ArrowRight, ArrowLeft, RefreshCw,
 } from 'lucide-react';
+import { api } from '../lib/api';
 import { ProcurementItem, ProcurementCategory } from '../store/appStore';
 
 const categories: ProcurementCategory[] = [
@@ -83,9 +84,33 @@ export default function AddProcurement({ onAdd, onDone }: Props) {
         ))}
       </div>
 
-      <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Register New Item</h2>
-        <p style={{ color: 'var(--text-dim)', fontSize: 13, margin: '6px 0 0', fontWeight: 500 }}>Add a new asset to the inventory system</p>
+      <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Register New Item</h2>
+          <p style={{ color: 'var(--text-dim)', fontSize: 13, margin: '6px 0 0', fontWeight: 500 }}>Add a new asset or sync from IT Category sheet</p>
+        </div>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={async () => {
+            const url = prompt('Enter your Google Sheet URL (Published as CSV):');
+            if (!url) return;
+            try {
+              setIsSubmitting(true);
+              const res = await api.sync.googleSheets(url);
+              alert(`Success! Imported ${res.added} IT items directly into inventory.`);
+              onDone(); // Redirect to library to see items
+            } catch (err: any) {
+              alert(`Sync Failed: ${err.message}`);
+            } finally {
+              setIsSubmitting(false);
+            }
+          }}
+          className="btn-ghost"
+          style={{ fontSize: 11, background: 'rgba(212,175,55,0.05)', border: '1px solid rgba(212,175,55,0.2)', color: 'var(--primary-vivid)' }}
+        >
+          <RefreshCw size={14} className={isSubmitting ? 'spin' : ''} /> Sync Google Sheet
+        </motion.button>
       </div>
 
       {step === 1 && (

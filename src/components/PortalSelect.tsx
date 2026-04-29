@@ -51,11 +51,9 @@ export default function PortalSelect({ onSelect, serverOnline }: PortalSelectPro
           initials: userName.slice(0, 2).toUpperCase() 
         };
         
-        if (role === 'admin') {
-          onSelect('admin', user);
-        } else {
-          setLoggedInUser(user);
-          setStep('portal');
+        if (role === 'admin' || role === 'supervisor' || role === 'inventory') {
+          // Take everyone directly to their selected portal
+          onSelect(role, user);
         }
       } else {
         // Fallback for offline mode (if allowed) or error
@@ -193,7 +191,6 @@ export default function PortalSelect({ onSelect, serverOnline }: PortalSelectPro
                     <span style={{ fontSize: 13, color: '#fca5a5', fontWeight: 600 }}>{error}</span>
                   </motion.div>
                 )}
-
                 <button type="submit" disabled={loading} className="bright-button" style={{ marginTop: 4, fontSize: 14, padding: '14px' }}>
                   {loading ? (
                     <><div style={{ width: 16, height: 16, border: '2px solid rgba(0,0,0,0.2)', borderTopColor: '#0c0e14', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> Signing in...</>
@@ -204,42 +201,8 @@ export default function PortalSelect({ onSelect, serverOnline }: PortalSelectPro
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 12 }}>
                   <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-                  <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Quick Entry</span>
                   <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
                 </div>
-
-                <motion.button
-                  type="button"
-                  whileHover={{ scale: 1.02, background: 'rgba(16,185,129,0.1)' }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => {
-                    setEmail('supervisor@mahad.edu');
-                    setPassword('super123');
-                    setRole('supervisor');
-                    // Trigger login after state update
-                    setTimeout(() => {
-                      const btn = document.querySelector('button[type="submit"]') as HTMLButtonElement;
-                      btn?.click();
-                    }, 100);
-                  }}
-                  style={{
-                    background: 'transparent',
-                    border: '1px solid rgba(16,185,129,0.3)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '12px',
-                    color: '#34d399',
-                    fontSize: 13,
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 8
-                  }}
-                >
-                  <HardHat size={16} /> Direct Supervisor Login
-                </motion.button>
               </form>
             </motion.div>
           )}

@@ -186,17 +186,6 @@ export default function AdminDashboard({ items, complaints, onNavigate }: Props)
         <motion.button 
           whileHover={{ y: -2, scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={handleSync} 
-          disabled={syncing} 
-          className="btn-ghost" 
-          style={{ fontSize: 12, opacity: syncing ? 0.6 : 1 }}
-        >
-          <RefreshCw size={14} style={{ animation: syncing ? 'spin 2s linear infinite' : 'none' }} />
-          {syncing ? 'Syncing...' : 'Sync Sheets'}
-        </motion.button>
-        <motion.button 
-          whileHover={{ y: -2, scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
           onClick={handlePrint} 
           className="btn-ghost" 
           style={{ fontSize: 12 }}

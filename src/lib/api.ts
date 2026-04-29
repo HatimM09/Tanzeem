@@ -181,9 +181,79 @@ export const api = {
 
   sync: {
     googleSheets: async (sheetUrl: string) => {
-      // Placeholder for now, can be implemented with a Supabase Edge Function
-      console.log('Google Sheets sync requested for:', sheetUrl);
-      return { added: 0, updated: 0 };
+      // Ensure the URL is for CSV export
+      let csvUrl = sheetUrl;
+      if (sheetUrl.includes('/edit')) {
+        csvUrl = sheetUrl.replace(/\/edit.*$/, '/export?format=csv');
+      }
+
+      try {
+        const response = await fetch(csvUrl);
+        const csvData = await response.text();
+        
+        const lines = csvData.split('\n').filter(line => line.trim() !== '');
+        if (lines.length < 2) return { added: 0, updated: 0 };
+
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/[^a-z]/g, ''));
+        const items = lines.slice(1);
+
+        let added = 0;
+        let updated = 0;
+        const newItems: any[] = [];
+
+        for (const line of items) {
+          // Robust CSV parsing for quoted values
+          const values: string[] = [];
+          let current = '';
+          let inQuotes = false;
+          for (let char of line) {
+            if (char === '"') inQuotes = !inQuotes;
+            else if (char === ',' && !inQuotes) {
+              values.push(current.trim());
+              current = '';
+            } else {
+              current += char;
+            }
+          }
+          values.push(current.trim());
+
+          const row: any = {};
+          headers.forEach((h, i) => { 
+            let key = h;
+            if (h.includes('name') || h === 'item') key = 'name';
+            if (h.includes('price')) key = 'unitprice';
+            if (h.includes('assigned') || h.includes('owner')) key = 'assignedto';
+            if (h.includes('sku') || h.includes('code')) key = 'sku';
+            if (h.includes('count') || h.includes('qty')) key = 'stock';
+            row[key] = values[i]; 
+          });
+
+          const barcode = row.barcode || row.sku || `IT-${Math.random().toString(36).substring(7).toUpperCase()}`;
+          
+          newItems.push({
+            name: row.name || 'Unnamed Item',
+            sku: row.sku || null,
+            category: row.category || 'IT Equipment',
+            unit_price: parseFloat(String(row.unitprice).replace(/[^0-9.]/g, '')) || 0,
+            unit: row.unit || 'unit',
+            vendor: row.vendor || 'Internal',
+            stock: parseInt(String(row.stock).replace(/[^0-9]/g, '')) || 0,
+            assigned_to: row.assignedto || 'Unassigned',
+            location: row.location || 'Main Store',
+            barcode: barcode,
+            created_by: 'Google Sheets Sync',
+            condition: 'Good'
+          });
+        }
+
+        const { data, error } = await supabase.from('items').upsert(newItems, { onConflict: 'barcode' });
+        if (error) throw error;
+
+        return { added: newItems.length, updated: 0 };
+      } catch (err) {
+        console.error('Sync Error:', err);
+        throw err;
+      }
     },
     listBackups: async () => [],
     getBackupUrl: (filename: string) => `#`,
