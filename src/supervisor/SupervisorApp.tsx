@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ScanLine, History, AlertTriangle, LogOut, ChevronLeft, ChevronRight, Radio } from 'lucide-react';
+import { ScanLine, History, AlertTriangle, LogOut, ChevronLeft, ChevronRight, Radio, CheckSquare } from 'lucide-react';
 import SupervisorScanner from './SupervisorScanner';
 import ScanHistory from './ScanHistory';
 import RaiseComplaint from './RaiseComplaint';
+import BarcodeLibrary from '../admin/BarcodeLibrary';
+import SupervisorAudit from './SupervisorAudit';
 import { ProcurementItem, ScanRecord, Complaint } from '../store/appStore';
 import type { AuthUser } from '../components/PortalSelect';
 import UserAvatar from '../components/UserAvatar';
 import { MaintenanceEntry } from './MaintenanceLog';
 
-type SupTab = 'scan' | 'history' | 'complaints';
+type SupTab = 'scan' | 'audit' | 'history' | 'inventory' | 'complaints';
 
 interface Props {
   items: ProcurementItem[];
@@ -47,7 +49,9 @@ export default function SupervisorApp({
 
   const tabs = [
     { id: 'scan' as SupTab, label: 'Scanner', icon: ScanLine },
-    { id: 'history' as SupTab, label: 'History', icon: History, badge: scanHistory.length },
+    { id: 'audit' as SupTab, label: 'Room Audit', icon: CheckSquare },
+    { id: 'inventory' as SupTab, label: 'Inventory', icon: History }, // Using History icon for now or Tag
+    { id: 'history' as SupTab, label: 'Scan History', icon: History, badge: scanHistory.length },
     { id: 'complaints' as SupTab, label: 'Complaints', icon: AlertTriangle, badge: openCount },
   ];
 
@@ -112,7 +116,7 @@ export default function SupervisorApp({
           <div>
             <div style={{ fontSize: 13, color: 'var(--text-dim)', fontWeight: 500, marginBottom: 2 }}>{greeting}, {currentUser.name?.split(' ')[0]} 👋</div>
             <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.3px' }}>
-              {tab === 'scan' ? 'Barcode Scanner' : tab === 'history' ? 'Scan History' : 'Complaints'}
+              {tab === 'scan' ? 'Barcode Scanner' : tab === 'audit' ? 'Room Audit Mode' : tab === 'history' ? 'Scan History' : tab === 'inventory' ? 'Inventory Library' : 'Complaints'}
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -143,7 +147,9 @@ export default function SupervisorApp({
                   onAddMaintenanceLog={handleAddMaintenanceLog}
                 />
               )}
+              {tab === 'audit' && <SupervisorAudit items={items} />}
               {tab === 'history' && <ScanHistory records={scanHistory} />}
+              {tab === 'inventory' && <BarcodeLibrary items={items} maintenance={maintenanceLogs as any} />}
               {tab === 'complaints' && <RaiseComplaint items={items} complaints={myComplaints} onRaise={onRaiseComplaint} />}
             </motion.div>
           </AnimatePresence>

@@ -13,11 +13,13 @@ import CSVArchive from './CSVArchive';
 import ProofGallery from './ProofGallery';
 import InteractiveMap from './InteractiveMap';
 import QRDesigner from './QRDesigner';
+import ItemCategories from './ItemCategories';
+import AddItemFlow from '../components/AddItemFlow';
 import { ProcurementItem, Complaint, MaintenanceRecord, AuditLog } from '../store/appStore';
 import type { AuthUser } from '../components/PortalSelect';
 import UserAvatar from '../components/UserAvatar';
 
-type AdminTab = 'dashboard' | 'add' | 'library' | 'complaints' | 'archive' | 'proof' | 'logs' | 'map' | 'qr' | 'whatsapp';
+type AdminTab = 'dashboard' | 'library' | 'complaints' | 'archive' | 'proof' | 'logs' | 'map' | 'qr' | 'whatsapp' | 'add-item';
 
 interface AdminAppProps {
   items: ProcurementItem[];
@@ -53,7 +55,7 @@ export default function AdminApp({
     { id: 'dashboard' as AdminTab, label: 'Dashboard', icon: LayoutGrid },
     { id: 'map' as AdminTab, label: 'Live Map', icon: MapPin },
     { id: 'library' as AdminTab, label: 'Inventory', icon: Tag },
-    { id: 'add' as AdminTab, label: 'Add Item', icon: PlusCircle },
+    { id: 'add-item' as AdminTab, label: 'Add Item', icon: PlusCircle },
     { id: 'qr' as AdminTab, label: 'QR Labels', icon: QrCode },
     { id: 'complaints' as AdminTab, label: 'Complaints', icon: AlertCircle, badge: openComplaints },
     { id: 'proof' as AdminTab, label: 'Proof', icon: Image },
@@ -123,7 +125,7 @@ export default function AdminApp({
           <div>
             <div style={{ fontSize: 13, color: 'var(--text-dim)', fontWeight: 500, marginBottom: 2 }}>{greeting}, {currentUser.name?.split(' ')[0]} 👋</div>
             <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.3px' }}>
-              {tab === 'dashboard' ? 'Dashboard' : tab === 'add' ? 'New Procurement' : tab === 'library' ? 'Inventory' : tab === 'complaints' ? 'Complaints' : tab === 'proof' ? 'Proof Gallery' : tab === 'archive' ? 'Archive' : tab === 'map' ? 'Interactive Campus Map' : tab === 'qr' ? 'Label Designer' : tab === 'whatsapp' ? 'WhatsApp Integration' : 'Audit Logs'}
+              {tab === 'dashboard' ? 'Dashboard' : tab === 'add-item' ? 'Add Item' : tab === 'add' ? 'New Procurement' : tab === 'library' ? 'Inventory' : tab === 'complaints' ? 'Complaints' : tab === 'proof' ? 'Proof Gallery' : tab === 'archive' ? 'Archive' : tab === 'map' ? 'Interactive Campus Map' : tab === 'qr' ? 'Label Designer' : tab === 'whatsapp' ? 'WhatsApp Integration' : 'Audit Logs'}
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -148,11 +150,16 @@ export default function AdminApp({
           <AnimatePresence mode="wait">
             <motion.div key={tab} {...pageTransition}>
               {tab === 'dashboard' && <AdminDashboard items={items} complaints={complaints} onNavigate={setTab} />}
-              {tab === 'add' && <AddProcurement onAdd={onAddItem} onDone={() => setTab('library')} />}
+              {tab === 'add-item' && (
+                <AddItemFlow 
+                  categories={['IT Equipment', 'Furniture', 'Lab Equipment', 'Library', 'Sports', 'Stationery', 'Electrical', 'Maintenance', 'Other']} 
+                  onAdd={onAddItem} 
+                  onDone={() => setTab('library')} 
+                />
+              )}
               {tab === 'library' && <BarcodeLibrary items={items} maintenance={maintenance} onDeleteItem={onDeleteItem} onBulkAdd={onBulkAdd} />}
               {tab === 'complaints' && <AdminComplaints complaints={complaints} onResolve={onResolveComplaint} />}
               {tab === 'map' && <InteractiveMap items={items} />}
-              {tab === 'qr' && <QRDesigner />}
               {tab === 'whatsapp' && (
                 <div className="fade-in">
                   <div className="bright-panel" style={{ padding: 40, textAlign: 'center' }}>

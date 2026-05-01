@@ -219,6 +219,31 @@ export default function AdminDashboard({ items, complaints, onNavigate }: Props)
         </div>
       )}
 
+      {/* Low Stock Alerts */}
+      {items.filter(i => (i.stock || 1) <= 5 && ['Stationery', 'Maintenance', 'Electrical'].includes(i.category)).length > 0 && (
+        <div style={{ marginBottom: 24, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {items.filter(i => (i.stock || 1) <= 5 && ['Stationery', 'Maintenance', 'Electrical'].includes(i.category)).slice(0, 3).map(i => (
+            <motion.div key={i.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+              style={{
+                background: 'linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.03))',
+                border: '1px solid rgba(245,158,11,0.15)',
+                padding: '14px 18px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 14,
+              }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(245,158,11,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Package size={18} color="#f59e0b" />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#fcd34d' }}>LOW STOCK: {i.name}</div>
+                <div style={{ fontSize: 11, color: '#f59e0b', fontWeight: 600, opacity: 0.8 }}>Only {i.stock || 1} units remaining in inventory</div>
+              </div>
+              <button onClick={() => onNavigate('library')} className="btn-ghost" style={{ padding: '8px 14px', fontSize: 10, borderRadius: 8, color: '#f59e0b', borderColor: 'rgba(245,158,11,0.3)' }}>
+                RESTOCK
+              </button>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
       {/* Stats Grid */}
       <div className="bento-grid-3" style={{ marginBottom: 24 }}>
         {stats.map((s, i) => (

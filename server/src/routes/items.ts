@@ -4,6 +4,8 @@ import { validate } from '../middleware/validate';
 import { createItemSchema, updateItemSchema } from '../schemas/itemSchema';
 import { upload } from '../middleware/upload';
 import { requireAuth } from '../middleware/auth';
+import { syncItemToSheets } from '../services/googleSheets';
+
 
 const router = Router();
 
@@ -70,6 +72,9 @@ router.post('/',
       photoUrl,
     });
 
+    // Fire and forget: Sync to Google Sheets
+    syncItemToSheets(item).catch(err => console.error(err));
+
     res.status(201).json({
       success: true,
       data: item,
@@ -89,6 +94,9 @@ router.put('/:id',
       ...req.body,
       photoUrl,
     });
+
+    // Fire and forget: Sync to Google Sheets
+    syncItemToSheets(item).catch(err => console.error(err));
 
     res.json({
       success: true,

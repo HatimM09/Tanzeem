@@ -12,12 +12,22 @@ export default function InteractiveMap({ items }: Props) {
 
   // Group items by location for the map
   const locationMap: Record<string, { items: ProcurementItem[], x: number, y: number }> = {
-    'CS Lab - Room 201': { items: [], x: 25, y: 30 },
-    'Faculty Office - Block A': { items: [], x: 65, y: 25 },
-    'Electronics Lab - Room 105': { items: [], x: 25, y: 70 },
-    'Auditorium - Main Hall': { items: [], x: 80, y: 60 },
-    'Central Library': { items: [], x: 45, y: 55 },
-    'Main Corridor - Block B': { items: [], x: 50, y: 85 },
+    // Left Offices
+    'Office 1': { items: [], x: 20, y: 20 },
+    'Office 2': { items: [], x: 35, y: 20 },
+    'Office 3': { items: [], x: 27, y: 35 },
+    
+    // Right eLearning
+    'eLearning Room 1': { items: [], x: 65, y: 25 },
+    'eLearning Room 2': { items: [], x: 75, y: 40 },
+
+    // Ground Floor Left
+    'Ground Office 1': { items: [], x: 20, y: 75 },
+    'Ground Office 2': { items: [], x: 30, y: 75 },
+    'Ground Office 3': { items: [], x: 40, y: 75 },
+
+    // Ground Floor Right
+    'Al-Mawaid Office': { items: [], x: 75, y: 75 },
   };
 
   items.forEach(item => {
@@ -48,14 +58,16 @@ export default function InteractiveMap({ items }: Props) {
         <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(var(--border) 1px, transparent 1px)', backgroundSize: '30px 30px', opacity: 0.5 }} />
         
         {/* Map Elements (Simplified blocks) */}
-        <div style={{ position: 'absolute', top: '15%', left: '15%', width: '30%', height: '30%', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: 12 }}>
-          <span style={{ position: 'absolute', top: 10, left: 14, fontSize: 10, fontWeight: 800, color: 'var(--text-dim)' }}>BLOCK A</span>
+        <div style={{ position: 'absolute', top: '10%', left: '10%', width: '35%', height: '40%', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: 12 }}>
+          <span style={{ position: 'absolute', top: 10, left: 14, fontSize: 10, fontWeight: 800, color: 'var(--text-dim)' }}>LEFT OFFICES</span>
         </div>
-        <div style={{ position: 'absolute', top: '15%', right: '10%', width: '35%', height: '45%', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: 12 }}>
-          <span style={{ position: 'absolute', top: 10, left: 14, fontSize: 10, fontWeight: 800, color: 'var(--text-dim)' }}>BLOCK B</span>
+        <div style={{ position: 'absolute', top: '10%', right: '10%', width: '40%', height: '40%', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: 12 }}>
+          <span style={{ position: 'absolute', top: 10, left: 14, fontSize: 10, fontWeight: 800, color: 'var(--text-dim)' }}>E-LEARNING ZONE</span>
         </div>
-        <div style={{ position: 'absolute', bottom: '10%', left: '20%', width: '40%', height: '30%', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: 12 }}>
-          <span style={{ position: 'absolute', top: 10, left: 14, fontSize: 10, fontWeight: 800, color: 'var(--text-dim)' }}>LAB COMPLEX</span>
+        <div style={{ position: 'absolute', bottom: '10%', left: '10%', right: '10%', height: '35%', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: 12 }}>
+          <span style={{ position: 'absolute', top: 10, left: 14, fontSize: 10, fontWeight: 800, color: 'var(--text-dim)' }}>GROUND FLOOR</span>
+          <span style={{ position: 'absolute', bottom: 10, right: 14, fontSize: 10, fontWeight: 800, color: 'var(--text-dim)' }}>AL-MAWAID</span>
+          <span style={{ position: 'absolute', bottom: 10, left: 14, fontSize: 10, fontWeight: 800, color: 'var(--text-dim)' }}>GROUND OFFICES</span>
         </div>
 
         {/* Hotspots */}

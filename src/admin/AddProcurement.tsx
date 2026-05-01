@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import {
   Package, MapPin, Tag, User, Camera,
   CheckCircle, ArrowRight, ArrowLeft, RefreshCw,
+  Cpu, HardDrive, CpuIcon, Layers,
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { ProcurementItem, ProcurementCategory } from '../store/appStore';
@@ -29,6 +30,16 @@ export default function AddProcurement({ onAdd, onDone }: Props) {
   const [condition, setCondition] = useState<'New' | 'Good' | 'Fair' | 'Poor' | 'Critical'>('New');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // IT Specific States
+  const [srNo, setSrNo] = useState('');
+  const [office, setOffice] = useState('');
+  const [idara, setIdara] = useState('');
+  const [seatings, setSeatings] = useState('');
+  const [processor, setProcessor] = useState('');
+  const [ram, setRam] = useState('');
+  const [hdd, setHdd] = useState('');
+  const [ssd, setSsd] = useState('');
+
   const generateBarcode = () => {
     const prefix = category.substring(0, 2).toUpperCase();
     const random = Math.floor(1000 + Math.random() * 9000);
@@ -50,6 +61,15 @@ export default function AddProcurement({ onAdd, onDone }: Props) {
       condition,
       createdAt: new Date().toISOString().split('T')[0],
       createdBy: 'Admin',
+      // IT Fields
+      srNo,
+      office,
+      idara,
+      seatings,
+      processor,
+      ram,
+      hdd,
+      ssd,
     };
 
     setTimeout(() => {
@@ -233,6 +253,58 @@ export default function AddProcurement({ onAdd, onDone }: Props) {
                 )}
               </div>
             </div>
+
+            {category === 'IT Equipment' && (
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ borderTop: '1px solid var(--border)', paddingTop: 24, marginTop: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(212,175,55,0.1)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Cpu size={16} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-main)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Technical Specifications</h3>
+                    <p style={{ fontSize: 10, color: 'var(--text-dim)', margin: 0 }}>Required for IT Category inventory sync</p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+                  <div>
+                    <label style={{ fontSize: 10, color: 'var(--text-dim)', fontWeight: 800, marginBottom: 8, display: 'block', textTransform: 'uppercase' }}>Sr No</label>
+                    <input className="input-field" placeholder="Serial Number" value={srNo} onChange={e => setSrNo(e.target.value)} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 10, color: 'var(--text-dim)', fontWeight: 800, marginBottom: 8, display: 'block', textTransform: 'uppercase' }}>Office</label>
+                    <input className="input-field" placeholder="Office Location" value={office} onChange={e => setOffice(e.target.value)} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 10, color: 'var(--text-dim)', fontWeight: 800, marginBottom: 8, display: 'block', textTransform: 'uppercase' }}>Idara</label>
+                    <input className="input-field" placeholder="Idara Name" value={idara} onChange={e => setIdara(e.target.value)} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 10, color: 'var(--text-dim)', fontWeight: 800, marginBottom: 8, display: 'block', textTransform: 'uppercase' }}>Seatings</label>
+                    <input className="input-field" placeholder="Seating Info" value={seatings} onChange={e => setSeatings(e.target.value)} />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div>
+                    <label style={{ fontSize: 10, color: 'var(--text-dim)', fontWeight: 800, marginBottom: 8, display: 'block', textTransform: 'uppercase' }}>Processor</label>
+                    <input className="input-field" placeholder="e.g. Core i7" value={processor} onChange={e => setProcessor(e.target.value)} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 10, color: 'var(--text-dim)', fontWeight: 800, marginBottom: 8, display: 'block', textTransform: 'uppercase' }}>Ram</label>
+                    <input className="input-field" placeholder="e.g. 16GB" value={ram} onChange={e => setRam(e.target.value)} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 10, color: 'var(--text-dim)', fontWeight: 800, marginBottom: 8, display: 'block', textTransform: 'uppercase' }}>HDD</label>
+                    <input className="input-field" placeholder="e.g. 1TB" value={hdd} onChange={e => setHdd(e.target.value)} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 10, color: 'var(--text-dim)', fontWeight: 800, marginBottom: 8, display: 'block', textTransform: 'uppercase' }}>SSD</label>
+                    <input className="input-field" placeholder="e.g. 512GB" value={ssd} onChange={e => setSsd(e.target.value)} />
+                  </div>
+                </div>
+              </motion.div>
+            )}
           </div>
 
           <div style={{ display: 'flex', gap: 12 }}>

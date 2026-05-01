@@ -144,6 +144,11 @@ export default function MaintenanceLog({ item, onBack, onSubmit }: Props) {
     };
     onSubmit(entry);
     setSubmitted(true);
+
+    // Update item condition in Supabase
+    import('../lib/api').then(({ api }) => {
+      api.items.update(item.id, { condition }).catch(console.error);
+    });
   };
 
   // ── Success screen ─────────────────────────────────────────────────────────

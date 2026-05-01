@@ -95,7 +95,15 @@ export const api = {
         photo_url: photoUrl,
         barcode: data.barcode || `UNIV-${Math.random().toString(36).substring(7).toUpperCase()}`,
         stock: data.stock || 1,
-        condition: data.condition || 'New'
+        condition: data.condition || 'New',
+        // IT Specific Fields
+        office: data.office,
+        idara: data.idara,
+        seatings: data.seatings,
+        processor: data.processor,
+        ram: data.ram,
+        hdd: data.hdd,
+        ssd: data.ssd
       }]).select().single();
 
       if (error) throw error;

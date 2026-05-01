@@ -28,6 +28,14 @@ export interface ProcurementItem {
   nextServiceDate?: string;
   createdAt: string;
   createdBy: string;
+  // IT Specific Fields
+  office?: string;
+  idara?: string;
+  seatings?: string;
+  processor?: string;
+  ram?: string;
+  hdd?: string;
+  ssd?: string;
 }
 
 export interface ScanRecord {
