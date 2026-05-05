@@ -79,6 +79,7 @@ export default function App() {
         <InventoryApp
           items={items} maintenance={maintenance}
           serverOnline={serverOnline} currentUser={activeUser}
+          onAddItem={addItem}
           onLogout={handleLogout}
         />
       )}

@@ -16,6 +16,7 @@ function mapItem(r: any): ProcurementItem {
     createdBy: r.created_by || r.createdBy,
     stock: r.stock || 0,
     reorderLevel: r.reorder_level || r.reorderLevel || 0,
+    unitPrice: r.unit_price || r.unitPrice || 0,
     condition: r.condition || 'Good',
     office: r.office,
     idara: r.idara,

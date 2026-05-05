@@ -20,7 +20,7 @@ interface Props {
 }
 
 const CATEGORIES: ProcurementCategory[] = [
-  'IT Equipment', 'Furniture', 'Lab Equipment', 'Library', 'Sports',
+  'IT Equipment', 'Accessories', 'Furniture', 'Lab Equipment', 'Library', 'Sports',
   'Stationery', 'Electrical', 'Maintenance', 'Other'
 ];
 
@@ -84,6 +84,7 @@ export default function ItemCategories({ items, onAdd, onBulkAdd }: Props) {
       barcode: `UNIV-${selectedCat.substring(0,2).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
       stock: 1,
       reorderLevel: 0,
+      unitPrice: 0,
       condition: 'New',
       createdAt: new Date().toISOString().split('T')[0],
       createdBy: 'Admin',
@@ -143,6 +144,7 @@ export default function ItemCategories({ items, onAdd, onBulkAdd }: Props) {
             barcode: `UNIV-${selectedCat.substring(0,2).toUpperCase()}-${Math.floor(Math.random()*10000)}`,
             stock: 1,
             reorderLevel: 0,
+            unitPrice: 0,
             condition: 'New' as const,
             office: normalized.office ? String(normalized.office) : undefined,
             idara: normalized.idara ? String(normalized.idara) : undefined,

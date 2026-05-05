@@ -24,13 +24,13 @@ function QRCodeDisplay({ barcode }: { barcode: string }) {
 }
 
 const categoryColors: Record<string, string> = {
-  'IT Equipment': '#818cf8', 'Furniture': '#fbbf24', 'Lab Equipment': '#22d3ee',
+  'IT Equipment': '#818cf8', 'Accessories': '#10b981', 'Furniture': '#fbbf24', 'Lab Equipment': '#22d3ee',
   'Library': '#34d399', 'Sports': '#fb923c', 'Stationery': '#c084fc',
   'Electrical': '#facc15', 'Maintenance': '#f87171', 'Other': '#94a3b8',
 };
 
 const allCats: (ProcurementCategory | 'All')[] = [
-  'All', 'IT Equipment', 'Furniture', 'Lab Equipment', 'Library',
+  'All', 'IT Equipment', 'Accessories', 'Furniture', 'Lab Equipment', 'Library',
   'Sports', 'Stationery', 'Electrical', 'Maintenance', 'Other',
 ];
 
@@ -120,6 +120,7 @@ export default function BarcodeLibrary({ items, maintenance, onDeleteItem, onBul
           barcode: `UNIV-${category.substring(0,2).toUpperCase()}-${Math.floor(Math.random()*10000)}`,
           stock: 1,
           reorderLevel: 0,
+          unitPrice: 0,
           condition: 'Good' as const
         };
       });

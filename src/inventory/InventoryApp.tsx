@@ -15,9 +15,10 @@ interface Props {
   serverOnline: boolean | null;
   currentUser: any;
   onLogout: () => void;
+  onAddItem: (item: any) => void;
 }
 
-export default function InventoryApp({ items, maintenance, serverOnline, currentUser, onLogout }: Props) {
+export default function InventoryApp({ items, maintenance, serverOnline, currentUser, onLogout, onAddItem }: Props) {
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState('All');
@@ -155,9 +156,7 @@ export default function InventoryApp({ items, maintenance, serverOnline, current
                 <AddItemFlow 
                   categories={categories.filter(c => c !== 'All')} 
                   onAdd={(item) => {
-                    // Logic to add to state if needed, but App.tsx handles global state
-                    // We'll assume the prop onAdd will be passed down if we need it
-                    console.log('Item added:', item);
+                    onAddItem(item);
                   }}
                   onDone={() => setIsAdding(false)}
                 />

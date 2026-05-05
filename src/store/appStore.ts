@@ -3,6 +3,7 @@
 export type ProcurementCategory =
   | 'Furniture'
   | 'IT Equipment'
+  | 'Accessories'
   | 'Lab Equipment'
   | 'Library'
   | 'Sports'
@@ -38,6 +39,8 @@ export interface ProcurementItem {
   hdd?: string;
   ssd?: string;
   srNo?: string;
+  win_spec?: string;
+  device_spec?: string;
 }
 
 export interface ScanRecord {
@@ -92,12 +95,12 @@ export interface AuditLog {
 
 // Seed data
 const seed: ProcurementItem[] = [
-  { id: 'itm001', name: 'Dell Monitor 24"', assignedTo: 'Dr. Ahmed Khan', location: 'CS Lab - Room 201', category: 'IT Equipment', photoUrl: null, barcode: 'UNIV-IT-001', createdAt: '2024-05-01', createdBy: 'Admin', stock: 15, reorderLevel: 5, condition: 'New' },
-  { id: 'itm002', name: 'Ergonomic Office Chair', assignedTo: 'Prof. Sara Ali', location: 'Faculty Office - Block A', category: 'Furniture', photoUrl: null, barcode: 'UNIV-FUR-002', createdAt: '2024-05-03', createdBy: 'Admin', stock: 24, reorderLevel: 10, condition: 'Good' },
-  { id: 'itm003', name: 'Oscilloscope DSO1054Z', assignedTo: 'Lab Technician', location: 'Electronics Lab - Room 105', category: 'Lab Equipment', photoUrl: null, barcode: 'UNIV-LAB-003', createdAt: '2024-05-05', createdBy: 'Admin', stock: 8, reorderLevel: 3, condition: 'Fair' },
-  { id: 'itm004', name: 'Projector BenQ MW550', assignedTo: 'Lecture Hall Staff', location: 'Auditorium - Main Hall', category: 'IT Equipment', photoUrl: null, barcode: 'UNIV-IT-004', createdAt: '2024-05-07', createdBy: 'Admin', stock: 12, reorderLevel: 4, condition: 'Good' },
-  { id: 'itm005', name: 'Bookshelf (5 Tier)', assignedTo: 'Library Staff', location: 'Central Library', category: 'Library', photoUrl: null, barcode: 'UNIV-LIB-005', createdAt: '2024-05-08', createdBy: 'Admin', stock: 45, reorderLevel: 15, condition: 'New' },
-  { id: 'itm006', name: 'Fire Extinguisher ABC', assignedTo: 'Safety Officer', location: 'Main Corridor - Block B', category: 'Maintenance', photoUrl: null, barcode: 'UNIV-MNT-006', createdAt: '2024-05-10', createdBy: 'Admin', stock: 4, reorderLevel: 2, condition: 'Good' },
+  { id: 'itm001', name: 'Dell Monitor 24"', assignedTo: 'Dr. Ahmed Khan', location: 'CS Lab - Room 201', category: 'IT Equipment', photoUrl: null, barcode: 'UNIV-IT-001', createdAt: '2024-05-01', createdBy: 'Admin', stock: 15, reorderLevel: 5, unitPrice: 0, condition: 'New' },
+  { id: 'itm002', name: 'Ergonomic Office Chair', assignedTo: 'Prof. Sara Ali', location: 'Faculty Office - Block A', category: 'Furniture', photoUrl: null, barcode: 'UNIV-FUR-002', createdAt: '2024-05-03', createdBy: 'Admin', stock: 24, reorderLevel: 10, unitPrice: 0, condition: 'Good' },
+  { id: 'itm003', name: 'Oscilloscope DSO1054Z', assignedTo: 'Lab Technician', location: 'Electronics Lab - Room 105', category: 'Lab Equipment', photoUrl: null, barcode: 'UNIV-LAB-003', createdAt: '2024-05-05', createdBy: 'Admin', stock: 8, reorderLevel: 3, unitPrice: 0, condition: 'Fair' },
+  { id: 'itm004', name: 'Projector BenQ MW550', assignedTo: 'Lecture Hall Staff', location: 'Auditorium - Main Hall', category: 'IT Equipment', photoUrl: null, barcode: 'UNIV-IT-004', createdAt: '2024-05-07', createdBy: 'Admin', stock: 12, reorderLevel: 4, unitPrice: 0, condition: 'Good' },
+  { id: 'itm005', name: 'Bookshelf (5 Tier)', assignedTo: 'Library Staff', location: 'Central Library', category: 'Library', photoUrl: null, barcode: 'UNIV-LIB-005', createdAt: '2024-05-08', createdBy: 'Admin', stock: 45, reorderLevel: 15, unitPrice: 0, condition: 'New' },
+  { id: 'itm006', name: 'Fire Extinguisher ABC', assignedTo: 'Safety Officer', location: 'Main Corridor - Block B', category: 'Maintenance', photoUrl: null, barcode: 'UNIV-MNT-006', createdAt: '2024-05-10', createdBy: 'Admin', stock: 4, reorderLevel: 2, unitPrice: 0, condition: 'Good' },
 ];
 
 const seedComplaints: Complaint[] = [

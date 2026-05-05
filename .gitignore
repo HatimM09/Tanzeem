@@ -28,3 +28,6 @@ server/google-credentials.json
 *.sw?
 .vite-source-tags.js
 .vercel
+
+.vercel
+.env*.local

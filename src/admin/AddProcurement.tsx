@@ -58,6 +58,7 @@ export default function AddProcurement({ onAdd, onDone }: Props) {
       barcode: generateBarcode(),
       stock,
       reorderLevel,
+      unitPrice: 0,
       condition,
       createdAt: new Date().toISOString().split('T')[0],
       createdBy: 'Admin',

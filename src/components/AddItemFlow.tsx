@@ -16,6 +16,12 @@ interface Props {
 
 export default function AddItemFlow({ onAdd, onDone }: Props) {
   const [step, setStep] = useState(1);
+
+  React.useEffect(() => {
+    if (step === 6) {
+      generatePDF();
+    }
+  }, [step]);
   
   const [formData, setFormData] = useState({
     // General
@@ -46,30 +52,67 @@ export default function AddItemFlow({ onAdd, onDone }: Props) {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step < 5) {
       setStep(step + 1);
     } else {
-      // Save data to global state
-      const newItem = {
+      // 1. Save Main PC Workstation
+      const pcId = formData.deviceId || `PC-${Math.floor(1000 + Math.random() * 9000)}`;
+      const pcItem = {
         id: Date.now().toString(),
-        name: `PC - ${formData.processorBrand || 'Unknown'} / ${formData.ramSize || 'Unknown'}`,
+        name: `PC: ${formData.processorBrand || 'Unknown'} - ${formData.winEdition || 'Windows'}`,
         assignedTo: formData.assignName,
         location: `${formData.officeName} - ${formData.deskName}`,
         category: 'IT Equipment',
-        photoUrl: null,
-        barcode: formData.deviceId || `UNIV-IT-${Math.floor(1000 + Math.random() * 9000)}`,
+        barcode: pcId,
         stock: 1,
         reorderLevel: 0,
+        unitPrice: 0,
+        photoUrl: null,
         condition: 'New',
         createdAt: new Date().toISOString().split('T')[0],
         createdBy: 'Admin',
-        // Optional IT fields based on schema
         processor: formData.processorBrand,
         ram: formData.ramBrand,
+        // Custom field for Windows spec
+        win_spec: `${formData.winEdition} ${formData.winVersion}`,
+        device_spec: `${formData.processorBrand} ${formData.processorSize} / ${formData.ramBrand} ${formData.ramSize}`
       };
       
-      onAdd(newItem);
+      onAdd(pcItem);
+
+      // 2. Save Accessories as separate items
+      const accessories = [
+        { name: 'Monitor', brand: 'monitorBrand', serial: 'monitorSerial' },
+        { name: 'Keyboard', brand: 'keyboardBrand', serial: 'keyboardSerial' },
+        { name: 'Mouse', brand: 'mouseBrand', serial: 'mouseSerial' },
+        { name: 'Headphones', brand: 'headphonesBrand', serial: 'headphonesSerial' },
+        { name: 'Speakers', brand: 'speakersBrand', serial: 'speakersSerial' },
+        { name: 'Webcam', brand: 'webcamBrand', serial: 'webcamSerial' }
+      ];
+
+      accessories.forEach(acc => {
+        const brand = (formData as any)[acc.brand];
+        const serial = (formData as any)[acc.serial];
+        if (serial) {
+          onAdd({
+            id: `${Date.now()}-${acc.name}`,
+            name: `${acc.name} - ${brand}`,
+            assignedTo: formData.assignName,
+            location: `${formData.officeName} - ${formData.deskName}`,
+            category: 'Accessories',
+            barcode: serial,
+            stock: 1,
+            reorderLevel: 0,
+            unitPrice: 0,
+            photoUrl: null,
+            condition: 'New',
+            createdAt: new Date().toISOString().split('T')[0],
+            createdBy: 'Admin'
+          });
+        }
+      });
+
       setStep(6); // Success / Generation Step
     }
   };
@@ -104,123 +147,133 @@ export default function AddItemFlow({ onAdd, onDone }: Props) {
       { name: 'Keyboard', brand: formData.keyboardBrand, serial: formData.keyboardSerial },
       { name: 'Mouse', brand: formData.mouseBrand, serial: formData.mouseSerial },
       { name: 'Headphones', brand: formData.headphonesBrand, serial: formData.headphonesSerial },
-      { name: 'Webcam', brand: formData.webcamBrand, serial: formData.webcamSerial },
       { name: 'Speakers', brand: formData.speakersBrand, serial: formData.speakersSerial }
     ].filter(a => a.serial);
 
-    // Prepare QR Code Data (Dynamic View Card Data)
+    // Prepare QR Code Data (Full Desk Information)
     const qrDataObj = {
-      Assignee: formData.assignName,
-      Office: formData.officeName,
-      Desk: formData.deskName,
-      PC: {
-        CPU: `${formData.processorBrand} ${formData.processorSize}`,
-        RAM: `${formData.ramBrand} ${formData.ramSize}`,
-        GPU: `${formData.gpuBrand} ${formData.gpuSize}`,
-        OS: `${formData.winEdition} ${formData.winVersion}`
-      },
-      Accessories: accBarcodes.map(a => a.name)
+      Desk_Report: {
+        Assigned_To: formData.assignName,
+        Location: `${formData.officeName} / ${formData.deskName}`,
+        Workstation: {
+          ID: pcId,
+          Processor: `${formData.processorBrand} (${formData.processorSize})`,
+          RAM: `${formData.ramBrand} (${formData.ramSize})`,
+          GPU: `${formData.gpuBrand} (${formData.gpuSize})`,
+          SMPS: `${formData.smpsBrand}`,
+          OS: `${formData.winEdition} v${formData.winVersion}`,
+          OS_Build: formData.winOsBuild
+        },
+        Accessories: accBarcodes.map(a => ({
+          Item: a.name,
+          Brand: a.brand,
+          Serial: a.serial
+        }))
+      }
     };
-    const qrCodeData = await QRCode.toDataURL(JSON.stringify(qrDataObj));
+    const qrCodeData = await QRCode.toDataURL(JSON.stringify(qrDataObj, null, 2));
 
     printWindow.document.write(`
       <html>
         <head>
-          <title>IT Equipment Labels - ${formData.assignName}</title>
+          <title>Inventory Labels - ${formData.assignName}</title>
           <style>
-            body { font-family: 'Inter', sans-serif; padding: 40px; color: #111; background: #fff; }
-            .page { page-break-after: always; }
-            .header { border-bottom: 3px solid #D4AF37; padding-bottom: 15px; margin-bottom: 30px; }
-            .title { font-size: 24px; font-weight: 900; margin: 0; color: #111; }
-            .subtitle { font-size: 14px; color: #666; margin-top: 5px; }
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono&display=swap');
+            body { font-family: 'Inter', sans-serif; padding: 20px; color: #111; background: #fff; }
+            .page { max-width: 800px; margin: 0 auto; }
+            .header { border-bottom: 4px solid #111; padding-bottom: 10px; margin-bottom: 20px; }
+            .title { font-size: 28px; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: -1px; }
             
-            /* Barcode Grid */
-            .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 40px; }
-            .label-card { border: 2px dashed #ccc; padding: 20px; border-radius: 12px; text-align: center; }
-            .label-title { font-size: 16px; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; }
-            .label-meta { font-size: 12px; color: #555; margin-top: 8px; }
-            .barcode-img { max-width: 100%; height: 60px; }
+            .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .label-card { border: 2px solid #111; padding: 15px; border-radius: 8px; position: relative; }
+            .label-title { font-size: 14px; font-weight: 900; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+            .barcode-img { width: 100%; height: 50px; object-fit: contain; margin: 10px 0; }
+            .label-meta { font-size: 10px; font-weight: 700; color: #444; margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
 
-            /* Dynamic View Card (QR Section) */
-            .dynamic-card { 
-              border: 2px solid #111; 
-              border-radius: 16px; 
-              padding: 30px; 
+            .desk-qr-container { 
+              margin-top: 30px; 
+              border: 3px solid #111; 
+              border-radius: 12px; 
+              padding: 20px; 
               display: flex; 
-              gap: 40px; 
+              gap: 30px; 
               align-items: center; 
-              background: #fafafa;
-              margin-top: 40px;
+              background: #fdfdfd;
             }
-            .qr-section { flex-shrink: 0; text-align: center; }
-            .qr-img { width: 200px; height: 200px; }
-            .qr-hint { font-size: 12px; font-weight: bold; margin-top: 10px; }
+            .qr-box { flex-shrink: 0; text-align: center; border-right: 2px dashed #ccc; padding-right: 30px; }
+            .qr-box img { width: 180px; height: 180px; }
+            .qr-label { font-size: 12px; font-weight: 900; margin-top: 10px; color: #111; }
             
-            .info-section { flex: 1; }
-            .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-            .info-item { background: #fff; padding: 10px 15px; border-radius: 8px; border: 1px solid #eee; }
-            .info-label { font-size: 10px; text-transform: uppercase; color: #888; font-weight: 800; }
-            .info-value { font-size: 14px; font-weight: 700; color: #111; margin-top: 4px; }
+            .info-box { flex: 1; }
+            .info-box h2 { margin: 0 0 15px 0; font-size: 18px; font-weight: 900; }
+            .info-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+            .info-tag { background: #f0f0f0; padding: 8px; border-radius: 4px; }
+            .info-tag-label { font-size: 9px; color: #888; font-weight: 800; text-transform: uppercase; }
+            .info-tag-value { font-size: 12px; font-weight: 700; color: #111; }
           </style>
         </head>
         <body>
           <div class="page">
             <div class="header">
-              <h1 class="title">IT Asset Deployment Labels</h1>
-              <div class="subtitle">Assignee: ${formData.assignName} | Office: ${formData.officeName} | Desk: ${formData.deskName}</div>
+              <h1 class="title">IT Asset Labels</h1>
+              <div style="font-size: 12px; font-weight: 700;">Desk: ${formData.deskName} | User: ${formData.assignName}</div>
             </div>
 
             <div class="grid">
-              <!-- Main PC Barcode -->
-              <div class="label-card">
-                <div class="label-title">Main Workstation (Device + OS)</div>
-                ${pcBarcode ? `<img class="barcode-img" src="${pcBarcode}" />` : '<div style="color:red">No Device ID provided</div>'}
-                <div class="label-meta">Processor: ${formData.processorBrand} | RAM: ${formData.ramBrand}</div>
-                <div class="label-meta">OS: ${formData.winEdition}</div>
+              <!-- Combined PC & Windows Label -->
+              <div class="label-card" style="grid-column: span 2; background: #f9f9f9;">
+                <div class="label-title">MAIN WORKSTATION (HW SPEC + WINDOWS)</div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                  <div style="flex: 1;">
+                    ${pcBarcode ? `<img class="barcode-img" src="${pcBarcode}" />` : '<div style="color:red">No Device ID</div>'}
+                    <div style="text-align: center; font-size: 12px; font-weight: 900;">${pcId}</div>
+                  </div>
+                  <div style="flex: 1; border-left: 1px solid #ddd; padding-left: 20px;">
+                    <div class="label-meta">CPU: ${formData.processorBrand}</div>
+                    <div class="label-meta">RAM: ${formData.ramBrand} ${formData.ramSize}</div>
+                    <div class="label-meta">OS: ${formData.winEdition}</div>
+                    <div class="label-meta">Ver: ${formData.winVersion} | Build: ${formData.winOsBuild}</div>
+                  </div>
+                </div>
               </div>
 
-              <!-- Accessories Barcodes -->
+              <!-- Individual Accessory Labels -->
               ${accBarcodes.map(acc => `
                 <div class="label-card">
-                  <div class="label-title">${acc.name}</div>
+                  <div class="label-title">${acc.name.toUpperCase()}</div>
                   <img class="barcode-img" src="${getBarcode(acc.serial)}" />
+                  <div style="text-align: center; font-size: 10px; font-weight: 900; margin-bottom: 8px;">${acc.serial}</div>
                   <div class="label-meta">Brand: ${acc.brand}</div>
                 </div>
               `).join('')}
             </div>
 
-            <!-- The Desk QR Dynamic View Card -->
-            <div class="dynamic-card">
-              <div class="qr-section">
-                <img class="qr-img" src="${qrCodeData}" />
-                <div class="qr-hint">SCAN FOR FULL PREVIEW</div>
+            <!-- Full Desk QR Information -->
+            <div class="desk-qr-container">
+              <div class="qr-box">
+                <img src="${qrCodeData}" />
+                <div class="qr-label">FULL DESK QR CODE</div>
               </div>
-              <div class="info-section">
-                <h2 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 900; border-bottom: 2px solid #ddd; padding-bottom: 10px;">Desk Assignment Summary</h2>
-                <div class="info-grid">
-                  <div class="info-item">
-                    <div class="info-label">Assigned To</div>
-                    <div class="info-value">${formData.assignName}</div>
-                  </div>
-                  <div class="info-item">
-                    <div class="info-label">Location</div>
-                    <div class="info-value">${formData.officeName} - ${formData.deskName}</div>
-                  </div>
-                  <div class="info-item">
-                    <div class="info-label">System</div>
-                    <div class="info-value">${formData.processorBrand} ${formData.processorSize} / ${formData.ramSize} RAM</div>
-                  </div>
-                  <div class="info-item">
-                    <div class="info-label">Accessories Linked</div>
-                    <div class="info-value">${accBarcodes.length} Items</div>
-                  </div>
+              <div class="info-box">
+                <h2>Desk Assignment Summary</h2>
+                <div class="info-list">
+                  <div class="info-tag"><div class="info-tag-label">User</div><div class="info-tag-value">${formData.assignName}</div></div>
+                  <div class="info-tag"><div class="info-tag-label">Location</div><div class="info-tag-value">${formData.officeName} - ${formData.deskName}</div></div>
+                  <div class="info-tag"><div class="info-tag-label">Workstation</div><div class="info-tag-value">${formData.processorBrand} / ${formData.ramSize}</div></div>
+                  <div class="info-tag"><div class="info-tag-label">Peripherals</div><div class="info-tag-value">${accBarcodes.length} Items Linked</div></div>
                 </div>
+                <p style="font-size: 10px; color: #888; margin-top: 15px;">Scanning this QR provides complete hardware and software specifications for this desk.</p>
               </div>
             </div>
 
           </div>
           <script>
-            setTimeout(() => window.print(), 500);
+            window.onload = () => {
+              setTimeout(() => {
+                window.print();
+                // window.close();
+              }, 500);
+            };
           </script>
         </body>
       </html>

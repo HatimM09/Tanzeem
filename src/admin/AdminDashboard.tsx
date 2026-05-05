@@ -7,6 +7,7 @@ import { useState } from 'react';
 
 const categoryColors: Record<string, string> = {
   'IT Equipment': '#818cf8',
+  'Accessories': '#10b981',
   'Furniture': '#fbbf24',
   'Lab Equipment': '#22d3ee',
   'Library': '#34d399',

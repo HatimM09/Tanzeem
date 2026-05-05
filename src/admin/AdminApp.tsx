@@ -125,7 +125,7 @@ export default function AdminApp({
           <div>
             <div style={{ fontSize: 13, color: 'var(--text-dim)', fontWeight: 500, marginBottom: 2 }}>{greeting}, {currentUser.name?.split(' ')[0]} 👋</div>
             <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.3px' }}>
-              {tab === 'dashboard' ? 'Dashboard' : tab === 'add-item' ? 'Add Item' : tab === 'add' ? 'New Procurement' : tab === 'library' ? 'Inventory' : tab === 'complaints' ? 'Complaints' : tab === 'proof' ? 'Proof Gallery' : tab === 'archive' ? 'Archive' : tab === 'map' ? 'Interactive Campus Map' : tab === 'qr' ? 'Label Designer' : tab === 'whatsapp' ? 'WhatsApp Integration' : 'Audit Logs'}
+              {tab === 'dashboard' ? 'Dashboard' : tab === 'add-item' ? 'Add Item' : tab === 'library' ? 'Inventory' : tab === 'complaints' ? 'Complaints' : tab === 'proof' ? 'Proof Gallery' : tab === 'archive' ? 'Archive' : tab === 'map' ? 'Interactive Campus Map' : tab === 'qr' ? 'Label Designer' : tab === 'whatsapp' ? 'WhatsApp Integration' : 'Audit Logs'}
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -152,7 +152,7 @@ export default function AdminApp({
               {tab === 'dashboard' && <AdminDashboard items={items} complaints={complaints} onNavigate={setTab} />}
               {tab === 'add-item' && (
                 <AddItemFlow 
-                  categories={['IT Equipment', 'Furniture', 'Lab Equipment', 'Library', 'Sports', 'Stationery', 'Electrical', 'Maintenance', 'Other']} 
+                  categories={['IT Equipment', 'Accessories', 'Furniture', 'Lab Equipment', 'Library', 'Sports', 'Stationery', 'Electrical', 'Maintenance', 'Other']} 
                   onAdd={onAddItem} 
                   onDone={() => setTab('library')} 
                 />
