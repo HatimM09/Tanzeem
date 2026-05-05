@@ -80,6 +80,7 @@ export default function App() {
           items={items} maintenance={maintenance}
           serverOnline={serverOnline} currentUser={activeUser}
           onAddItem={addItem}
+          onBulkAdd={handleBulkAdd}
           onLogout={handleLogout}
         />
       )}

@@ -10,11 +10,12 @@ import QRCode from 'qrcode';
 
 interface Props {
   onAdd: (item: any) => void;
+  onBulkAdd?: (items: any[]) => void;
   onDone: () => void;
   categories?: string[];
 }
 
-export default function AddItemFlow({ onAdd, onDone }: Props) {
+export default function AddItemFlow({ onAdd, onBulkAdd, onDone }: Props) {
   const [step, setStep] = useState(1);
 
   React.useEffect(() => {
@@ -81,7 +82,9 @@ export default function AddItemFlow({ onAdd, onDone }: Props) {
       
       onAdd(pcItem);
 
-      // 2. Save Accessories as separate items
+      // 3. Combine for Bulk Add
+      const allItemsToSave = [pcItem];
+      
       const accessories = [
         { name: 'Monitor', brand: 'monitorBrand', serial: 'monitorSerial' },
         { name: 'Keyboard', brand: 'keyboardBrand', serial: 'keyboardSerial' },
@@ -94,8 +97,8 @@ export default function AddItemFlow({ onAdd, onDone }: Props) {
       accessories.forEach(acc => {
         const brand = (formData as any)[acc.brand];
         const serial = (formData as any)[acc.serial];
-        if (serial) {
-          onAdd({
+        if (serial && serial.trim() !== '') {
+          allItemsToSave.push({
             id: `${Date.now()}-${acc.name}`,
             name: `${acc.name} - ${brand}`,
             assignedTo: formData.assignName,
@@ -112,6 +115,15 @@ export default function AddItemFlow({ onAdd, onDone }: Props) {
           });
         }
       });
+
+      if (onBulkAdd) {
+        await onBulkAdd(allItemsToSave);
+      } else {
+        // Fallback to individual adds if bulk not available
+        for (const item of allItemsToSave) {
+          await onAdd(item);
+        }
+      }
 
       setStep(6); // Success / Generation Step
     }
@@ -141,14 +153,19 @@ export default function AddItemFlow({ onAdd, onDone }: Props) {
     const pcId = formData.deviceId || `PC-${Math.floor(Math.random()*10000)}`;
     const pcBarcode = getBarcode(pcId);
     
-    // Accessory Barcodes
-    const accBarcodes = [
+    // Asset Barcodes (Internal Components + Peripherals)
+    const allAssetBarcodes = [
+      { name: 'Processor', brand: formData.processorBrand, serial: formData.processorSerial },
+      { name: 'RAM', brand: formData.ramBrand, serial: formData.ramSerial },
+      { name: 'Graphics', brand: formData.gpuBrand, serial: formData.gpuSerial },
+      { name: 'SMPS', brand: formData.smpsBrand, serial: formData.smpsSerial },
       { name: 'Monitor', brand: formData.monitorBrand, serial: formData.monitorSerial },
       { name: 'Keyboard', brand: formData.keyboardBrand, serial: formData.keyboardSerial },
       { name: 'Mouse', brand: formData.mouseBrand, serial: formData.mouseSerial },
       { name: 'Headphones', brand: formData.headphonesBrand, serial: formData.headphonesSerial },
-      { name: 'Speakers', brand: formData.speakersBrand, serial: formData.speakersSerial }
-    ].filter(a => a.serial);
+      { name: 'Speakers', brand: formData.speakersBrand, serial: formData.speakersSerial },
+      { name: 'Webcam', brand: formData.webcamBrand, serial: formData.webcamSerial }
+    ].filter(a => a.serial && a.serial.trim() !== '');
 
     // Prepare QR Code Data (Full Desk Information)
     const qrDataObj = {
@@ -164,7 +181,7 @@ export default function AddItemFlow({ onAdd, onDone }: Props) {
           OS: `${formData.winEdition} v${formData.winVersion}`,
           OS_Build: formData.winOsBuild
         },
-        Accessories: accBarcodes.map(a => ({
+        Accessories: allAssetBarcodes.map(a => ({
           Item: a.name,
           Brand: a.brand,
           Serial: a.serial
@@ -237,15 +254,17 @@ export default function AddItemFlow({ onAdd, onDone }: Props) {
                 </div>
               </div>
 
-              <!-- Individual Accessory Labels -->
-              ${accBarcodes.map(acc => `
+              <!-- Individual Asset Labels -->
+              ${allAssetBarcodes.map(acc => {
+                const b64 = getBarcode(acc.serial);
+                return `
                 <div class="label-card">
                   <div class="label-title">${acc.name.toUpperCase()}</div>
-                  <img class="barcode-img" src="${getBarcode(acc.serial)}" />
+                  ${b64 ? `<img class="barcode-img" src="${b64}" />` : `<div style="padding:10px; border:1px dashed #ccc; font-size:10px; text-align:center; margin:10px 0;">[Barcode Generation Error]</div>`}
                   <div style="text-align: center; font-size: 10px; font-weight: 900; margin-bottom: 8px;">${acc.serial}</div>
                   <div class="label-meta">Brand: ${acc.brand}</div>
                 </div>
-              `).join('')}
+              `}).join('')}
             </div>
 
             <!-- Full Desk QR Information -->
@@ -260,7 +279,7 @@ export default function AddItemFlow({ onAdd, onDone }: Props) {
                   <div class="info-tag"><div class="info-tag-label">User</div><div class="info-tag-value">${formData.assignName}</div></div>
                   <div class="info-tag"><div class="info-tag-label">Location</div><div class="info-tag-value">${formData.officeName} - ${formData.deskName}</div></div>
                   <div class="info-tag"><div class="info-tag-label">Workstation</div><div class="info-tag-value">${formData.processorBrand} / ${formData.ramSize}</div></div>
-                  <div class="info-tag"><div class="info-tag-label">Peripherals</div><div class="info-tag-value">${accBarcodes.length} Items Linked</div></div>
+                  <div class="info-tag"><div class="info-tag-label">Linked Assets</div><div class="info-tag-value">${allAssetBarcodes.length} Barcodes</div></div>
                 </div>
                 <p style="font-size: 10px; color: #888; margin-top: 15px;">Scanning this QR provides complete hardware and software specifications for this desk.</p>
               </div>

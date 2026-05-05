@@ -16,9 +16,10 @@ interface Props {
   currentUser: any;
   onLogout: () => void;
   onAddItem: (item: any) => void;
+  onBulkAdd?: (items: any[]) => void;
 }
 
-export default function InventoryApp({ items, maintenance, serverOnline, currentUser, onLogout, onAddItem }: Props) {
+export default function InventoryApp({ items, maintenance, serverOnline, currentUser, onLogout, onAddItem, onBulkAdd }: Props) {
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState('All');
@@ -158,6 +159,7 @@ export default function InventoryApp({ items, maintenance, serverOnline, current
                   onAdd={(item) => {
                     onAddItem(item);
                   }}
+                  onBulkAdd={onBulkAdd}
                   onDone={() => setIsAdding(false)}
                 />
               </motion.div>
