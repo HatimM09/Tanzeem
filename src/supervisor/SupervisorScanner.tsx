@@ -264,27 +264,34 @@ export default function SupervisorScanner({ items, onAddScan, onItemScanned, onA
         <button onClick={handleManual} className="btn-ghost" style={{ whiteSpace: 'nowrap' }}>Lookup</button>
       </div>
 
-      {/* Result card */}
+      {/* Result Card Modal Overlay */}
       <AnimatePresence>
         {result && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}>
-            {result.item ? (
-              <ItemResultCard
-                item={result.item}
-                barcode={result.barcode}
-                onReset={() => setResult(null)}
-                onEdit={() => openMaintenance(result.item!)}
-              />
-            ) : (
-              <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 16, padding: 20, textAlign: 'center' }}>
-                <div style={{ fontSize: 36, marginBottom: 10 }}>🔍</div>
-                <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 6px' }}>Not Found</h3>
-                <p style={{ fontSize: 13, color: 'var(--text-dim)', margin: '0 0 6px' }}>No item matched this barcode</p>
-                <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 12, color: 'var(--danger)', marginBottom: 14 }}>{result.barcode}</div>
-                <button onClick={() => setResult(null)} className="btn-ghost" style={{ margin: '0 auto' }}>Scan Again</button>
-              </div>
-            )}
-          </motion.div>
+          <div style={{ position: 'fixed', inset: 0, zindex: 500, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }} 
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              style={{ width: '100%', maxWidth: 450 }}
+            >
+              {result.item ? (
+                <ItemResultCard
+                  item={result.item}
+                  barcode={result.barcode}
+                  onReset={() => setResult(null)}
+                  onEdit={() => openMaintenance(result.item!)}
+                />
+              ) : (
+                <div className="bright-panel" style={{ textAlign: 'center', padding: 32 }}>
+                  <div style={{ fontSize: 48, marginBottom: 16 }}>🔍</div>
+                  <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', margin: '0 0 8px' }}>Asset Not Found</h3>
+                  <p style={{ fontSize: 14, color: 'var(--text-dim)', margin: '0 0 20px', fontWeight: 600 }}>No item matched this barcode in our system.</p>
+                  <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 13, color: 'var(--danger)', padding: '10px', background: 'rgba(239,68,68,0.1)', borderRadius: 8, marginBottom: 24 }}>{result.barcode}</div>
+                  <button onClick={() => setResult(null)} className="bright-button" style={{ width: '100%' }}>Try Another Scan</button>
+                </div>
+              )}
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>
@@ -345,6 +352,43 @@ function ItemResultCard({
             </div>
           ))}
         </div>
+
+        {/* IT Specific Details Popup */}
+        {(item.category === 'IT Equipment' || item.category === 'Accessories') && (
+          <div style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 12, padding: 14, marginBottom: 12 }}>
+            <h4 style={{ fontSize: 11, fontWeight: 800, color: '#10b981', textTransform: 'uppercase', margin: '0 0 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
+               TECHNICAL SPECIFICATIONS
+            </h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {item.device_spec && (
+                <div>
+                  <div style={{ fontSize: 9, color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase' }}>Hardware</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{item.device_spec}</div>
+                </div>
+              )}
+              {item.win_spec && (
+                <div>
+                  <div style={{ fontSize: 9, color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase' }}>OS Edition</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>{item.win_spec}</div>
+                </div>
+              )}
+              {item.processor && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div>
+                    <div style={{ fontSize: 9, color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase' }}>CPU</div>
+                    <div style={{ fontSize: 12, fontWeight: 600 }}>{item.processor}</div>
+                  </div>
+                  {item.ram && (
+                    <div>
+                      <div style={{ fontSize: 9, color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase' }}>RAM</div>
+                      <div style={{ fontSize: 12, fontWeight: 600 }}>{item.ram}</div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Item photo */}
         {item.photoUrl && (

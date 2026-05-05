@@ -19,6 +19,8 @@ function mapFrontendToBackend(data: any) {
     reorderLevel: 'reorder_level',
     unitPrice: 'unit_price',
     srNo: 'sr_no',
+    win_spec: 'win_spec',
+    device_spec: 'device_spec'
   };
 
   Object.entries(data).forEach(([key, value]) => {

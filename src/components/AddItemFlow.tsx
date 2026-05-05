@@ -80,8 +80,6 @@ export default function AddItemFlow({ onAdd, onBulkAdd, onDone }: Props) {
         device_spec: `${formData.processorBrand} ${formData.processorSize} / ${formData.ramBrand} ${formData.ramSize}`
       };
       
-      onAdd(pcItem);
-
       // 3. Combine for Bulk Add
       const allItemsToSave = [pcItem];
       
