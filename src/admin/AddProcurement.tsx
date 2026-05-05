@@ -72,11 +72,14 @@ export default function AddProcurement({ onAdd, onDone }: Props) {
       ssd,
     };
 
-    setTimeout(() => {
-      onAdd(newItem);
+    try {
+      await onAdd(newItem);
       setStep(3);
+    } catch (error: any) {
+      alert(`Registration failed: ${error.message}`);
+    } finally {
       setIsSubmitting(false);
-    }, 1200);
+    }
   };
 
   const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {

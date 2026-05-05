@@ -23,6 +23,7 @@ export interface ProcurementItem {
   barcode: string;
   stock: number;
   reorderLevel: number;
+  unitPrice: number;
   condition: 'New' | 'Good' | 'Fair' | 'Poor' | 'Critical';
   lastMaintainedAt?: string;
   nextServiceDate?: string;
@@ -36,6 +37,7 @@ export interface ProcurementItem {
   ram?: string;
   hdd?: string;
   ssd?: string;
+  srNo?: string;
 }
 
 export interface ScanRecord {

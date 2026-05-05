@@ -106,11 +106,13 @@ app.use((req: Request, res: Response) => {
 app.use(globalErrorHandler);
 
 // ─── Start server ─────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`\n📚 Procurement Tracker API Server`);
-  console.log(`   ➜  http://localhost:${PORT}`);
-  console.log(`   ➜  API docs: http://localhost:${PORT}/api`);
-  console.log(`   ➜  Health:   http://localhost:${PORT}/health\n`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`\n📚 Procurement Tracker API Server`);
+    console.log(`   ➜  http://localhost:${PORT}`);
+    console.log(`   ➜  API docs: http://localhost:${PORT}/api`);
+    console.log(`   ➜  Health:   http://localhost:${PORT}/health\n`);
+  });
+}
 
 export default app;

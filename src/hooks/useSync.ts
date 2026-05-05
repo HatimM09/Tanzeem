@@ -17,6 +17,14 @@ function mapItem(r: any): ProcurementItem {
     stock: r.stock || 0,
     reorderLevel: r.reorder_level || r.reorderLevel || 0,
     condition: r.condition || 'Good',
+    office: r.office,
+    idara: r.idara,
+    seatings: r.seatings,
+    processor: r.processor,
+    ram: r.ram,
+    hdd: r.hdd,
+    ssd: r.ssd,
+    srNo: r.sr_no || r.srNo,
   };
 }
 
@@ -99,9 +107,8 @@ export function useSync(initialItems: ProcurementItem[], initialComplaints: Comp
     if (serverOnline) {
       try {
         const created = await api.items.create({
-          name: item.name, assignedTo: item.assignedTo,
-          location: item.location, category: item.category,
-          createdBy: item.createdBy, photoDataUrl: item.photoUrl,
+          ...item,
+          photoDataUrl: item.photoUrl,
         });
         const mapped = mapItem(created);
         setItems(prev => [...prev, mapped]); 
@@ -143,7 +150,10 @@ export function useSync(initialItems: ProcurementItem[], initialComplaints: Comp
     if (serverOnline) {
       try {
         const saved = await api.complaints.raise({
-          itemId: complaint.itemId, description: complaint.description, raisedBy: complaint.raisedBy,
+          itemId: complaint.itemId,
+          description: complaint.description,
+          raisedBy: complaint.raisedBy,
+          priority: complaint.priority,
         });
         const mapped = mapComplaint(saved);
         setComplaints(prev => [...prev, mapped]); 

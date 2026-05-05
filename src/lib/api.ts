@@ -10,6 +10,25 @@ function dataURLtoBlob(dataURL: string): Blob {
   return new Blob([arr], { type: mime });
 }
 
+function mapFrontendToBackend(data: any) {
+  const mapped: any = {};
+  const mapping: Record<string, string> = {
+    assignedTo: 'assigned_to',
+    createdBy: 'created_by',
+    photoUrl: 'photo_url',
+    reorderLevel: 'reorder_level',
+    unitPrice: 'unit_price',
+    srNo: 'sr_no',
+  };
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (key === 'photoDataUrl' || key === 'id') return; // skip
+    const dbKey = mapping[key] || key;
+    mapped[dbKey] = value;
+  });
+  return mapped;
+}
+
 export const api = {
   auth: {
     login: async (email: string, password: string, role: string) => {
@@ -86,32 +105,22 @@ export const api = {
         photoUrl = publicUrl;
       }
 
-      const { data: item, error } = await supabase.from('items').insert([{
-        name: data.name,
-        assigned_to: data.assignedTo,
-        location: data.location,
-        category: data.category,
-        created_by: data.createdBy,
-        photo_url: photoUrl,
-        barcode: data.barcode || `UNIV-${Math.random().toString(36).substring(7).toUpperCase()}`,
-        stock: data.stock || 1,
-        condition: data.condition || 'New',
-        // IT Specific Fields
-        office: data.office,
-        idara: data.idara,
-        seatings: data.seatings,
-        processor: data.processor,
-        ram: data.ram,
-        hdd: data.hdd,
-        ssd: data.ssd
-      }]).select().single();
+      const dbData = mapFrontendToBackend(data);
+      if (photoUrl) dbData.photo_url = photoUrl;
+      if (!dbData.barcode) dbData.barcode = `UNIV-${Math.random().toString(36).substring(7).toUpperCase()}`;
+
+      const { data: item, error } = await supabase.from('items')
+        .insert([dbData])
+        .select()
+        .single();
 
       if (error) throw error;
       return item;
     },
 
     update: async (id: string, data: any) => {
-      const { error } = await supabase.from('items').update(data).eq('id', id);
+      const dbData = mapFrontendToBackend(data);
+      const { error } = await supabase.from('items').update(dbData).eq('id', id);
       if (error) throw error;
     },
 
@@ -121,10 +130,12 @@ export const api = {
     },
 
     bulkCreate: async (items: any[], performedBy: string) => {
-      const { data, error } = await supabase.from('items').insert(items.map(i => ({
-        ...i,
-        created_by: performedBy
-      })));
+      const dbItems = items.map(i => {
+        const mapped = mapFrontendToBackend(i);
+        mapped.created_by = performedBy;
+        return mapped;
+      });
+      const { data, error } = await supabase.from('items').insert(dbItems);
       if (error) throw error;
       return data;
     }
@@ -163,17 +174,33 @@ export const api = {
         location: item?.location,
         description: data.description,
         raised_by: data.raisedBy,
+        priority: data.priority || 'MEDIUM',
         status: 'open'
       }]).select().single();
       if (error) throw error;
       return res;
     },
     resolve: async (id: string, data: any) => {
+      let photoUrl = null;
+      if (data.photoDataUrl) {
+        const fileName = `res-${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+        const blob = dataURLtoBlob(data.photoDataUrl);
+        const { error: uploadError } = await supabase.storage
+          .from('inventory')
+          .upload(`resolutions/${fileName}`, blob);
+        
+        if (!uploadError) {
+          const { data: { publicUrl } } = supabase.storage.from('inventory').getPublicUrl(`resolutions/${fileName}`);
+          photoUrl = publicUrl;
+        }
+      }
+
       const { error } = await supabase.from('complaints').update({
         status: 'resolved',
         resolved_at: new Date().toISOString(),
         resolved_by: data.resolvedBy,
-        resolved_note: data.resolvedNote
+        resolved_note: data.resolvedNote,
+        resolved_photo_url: photoUrl
       }).eq('id', id);
       if (error) throw error;
     }
